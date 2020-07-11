@@ -127,6 +127,27 @@ namespace KhatmaBackEnd.Managers.Classes
             var user = _KhatmaContext.Users.Where(c => c.UserName == Loginuser.UserName && c.Password == Loginuser.Password).ToList().FirstOrDefault();
             if (user != null)
             {
+                if (!String.IsNullOrEmpty(Loginuser.DeviceToken))
+                {
+                    var userDevice = _KhatmaContext.userDevices.Where(c => c.UserID == user.Id).LastOrDefault();
+                    if (userDevice != null)
+                    {
+                        userDevice.DeviceToken = Loginuser.DeviceToken;
+                        _KhatmaContext.userDevices.Update(userDevice);
+                    }
+                    else
+                    { 
+                    var newUserDevice=new UserDevice()
+                    { 
+                    UserID=user.Id,
+                    DeviceToken=Loginuser.DeviceToken                  
+                    
+                    };
+                  _KhatmaContext.userDevices.Add(newUserDevice);
+                    }
+                    Save();
+
+                }
                 var group = _KhatmaContext.Groups.Find(user.GroupId);
                 var response = new LoginResponseViewModel();
                 response.User_Group = _Mapper.Map<Group, UserGroup>(group);

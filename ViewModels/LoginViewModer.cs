@@ -12,5 +12,6 @@ namespace KhatmaBackEnd.ViewModels
         public string UserName { get; set; }
         [Required]
         public string Password { get; set; }
+        public string DeviceToken { get; set; }
     }
 }

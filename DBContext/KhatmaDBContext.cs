@@ -13,6 +13,7 @@ namespace KhatmaBackEnd.DBContext
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<UserDevice> userDevices { get; set; }
         public KhatmaContext(DbContextOptions<KhatmaContext> options) : base(options)
         {
           Database.EnsureCreated();

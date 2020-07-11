@@ -48,6 +48,7 @@ namespace KhatmaBackEnd
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IGroupManager, GroupManager>();
+            services.AddSingleton<INotificationManager, NotificationManager>();
             services.AddHangfire(x => x.UseSqlServerStorage(ConnectionString));
             services.AddTransient(typeof(IHangFireJobService), typeof(HangFireJobService));
 

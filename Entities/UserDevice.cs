@@ -15,7 +15,7 @@ namespace KhatmaBackEnd.Entities
         [ForeignKey("UserID")]
         public int UserID { get; set; }
         public string DeviceToken { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
     }
 }
