@@ -9,5 +9,6 @@ namespace KhatmaBackEnd.Managers.Interfaces
     interface IHangFireJobService
     {
         Task<bool> UpdateKhatmaCountHangfire();
+        string NotifyUnreadedUsers();
     }
 }

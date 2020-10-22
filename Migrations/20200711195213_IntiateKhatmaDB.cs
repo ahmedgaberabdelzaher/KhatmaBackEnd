@@ -2,12 +2,26 @@
 
 namespace KhatmaBackEnd.Migrations
 {
-    public partial class IntiateKhatmaDb : Migration
+    public partial class IntiateKhatmaDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Groups",
+                name: "KhatmaSettings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    KhatmaCount = table.Column<int>(nullable: false),
+                    LastDistributedPage = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KhatmaSettings", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserGroups",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -16,20 +30,7 @@ namespace KhatmaBackEnd.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Groups", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Settings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    KhatmaCount = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Settings", x => x.Id);
+                    table.PrimaryKey("PK_UserGroups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,12 +50,37 @@ namespace KhatmaBackEnd.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Groups_GroupId",
+                        name: "FK_Users_UserGroups_GroupId",
                         column: x => x.GroupId,
-                        principalTable: "Groups",
+                        principalTable: "UserGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "userDevices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserID = table.Column<int>(nullable: false),
+                    DeviceToken = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_userDevices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_userDevices_Users_UserID",
+                        column: x => x.UserID,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_userDevices_UserID",
+                table: "userDevices",
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_GroupId",
@@ -65,13 +91,16 @@ namespace KhatmaBackEnd.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Settings");
+                name: "KhatmaSettings");
+
+            migrationBuilder.DropTable(
+                name: "userDevices");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Groups");
+                name: "UserGroups");
         }
     }
 }

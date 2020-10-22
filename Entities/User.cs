@@ -24,6 +24,6 @@ namespace KhatmaBackEnd.Entities
         [ForeignKey("GroupId")]
         public int GroupId { get; set; }
 
-        public virtual ICollection<UserDevice> Devices { get; set; }
+  //      public virtual ICollection<UserDevice> Devices { get; set; }
     }
 }

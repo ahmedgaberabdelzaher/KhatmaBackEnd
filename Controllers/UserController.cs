@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KhatmaBackEnd.DBContext;
 using KhatmaBackEnd.Entities;
+using KhatmaBackEnd.Managers.Classes;
 using KhatmaBackEnd.Managers.Interfaces;
 using KhatmaBackEnd.Utilites;
 using KhatmaBackEnd.ViewModels;
@@ -19,8 +20,10 @@ namespace KhatmaBackEnd.Controllers
         KhatmaContext _KhatmaContext;
         IMapper _Mapper;
         IUserManager _UserManager;
-        public UserController(KhatmaContext khatmaContext, IMapper Mapper, IUserManager userManager)
+        INotificationManager _notificationManager;
+        public UserController(KhatmaContext khatmaContext, IMapper Mapper, IUserManager userManager,INotificationManager notificationManager)
         {
+            _notificationManager = notificationManager;
             _UserManager = userManager;
             _KhatmaContext = khatmaContext;
             _Mapper = Mapper;
@@ -29,7 +32,14 @@ namespace KhatmaBackEnd.Controllers
         public IActionResult GetUsersByGroupId(int groupId)
         {
             //return Ok(_KhatmaContext.Users.Where(c=>c.GroupId==groupId));
-            return Ok(_UserManager.GetUsersByGroupId(groupId));
+            var data = _UserManager.GetUsersByGroupId(groupId);
+            return Ok(data);
+        } 
+        [HttpGet("SendNotifictaion/{deviceId}")]
+        public IActionResult SendNotifictaion(string deviceId)
+        {
+            //return Ok(_KhatmaContext.Users.Where(c=>c.GroupId==groupId));
+            return Ok(NotificationManager.SendPushNotification(deviceId));
         } 
         
         [HttpGet()]

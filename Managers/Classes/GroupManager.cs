@@ -25,14 +25,14 @@ namespace KhatmaBackEnd.Managers.Classes
             var groupViewModel = _Mapper.Map<GroupForCreateViewModel, Group>(groupForCreateViewModel);
             _KhatmaContext.Add(groupViewModel);
             Save();
-            var groupid = _KhatmaContext.Groups.ToList().Last().Id;
+            var groupid = _KhatmaContext.UserGroups.ToList().Last().Id;
             return new ProcessResult<int>() { Data = groupid, IsSucceeded = true, Message = "Group Added", Status = "201" };
 
         }
 
         public ProcessResult<List<GroupViewModel>> GetAll()
         {
-            var Groups = _KhatmaContext.Groups;
+            var Groups = _KhatmaContext.UserGroups;
             var MapedGroups = _Mapper.Map<List<GroupViewModel>>(Groups);
          return  new ProcessResult<List<GroupViewModel>>()
             {
@@ -45,7 +45,7 @@ namespace KhatmaBackEnd.Managers.Classes
 
         public bool IsGroupExist(string GroupName)
         {
-            return _KhatmaContext.Groups.Any(c => c.Name == GroupName);
+            return _KhatmaContext.UserGroups.Any(c => c.Name == GroupName);
         }
         public void Save()
         {

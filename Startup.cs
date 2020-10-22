@@ -34,10 +34,10 @@ namespace KhatmaBackEnd
         {
             _services = services;
             services.AddControllers().AddXmlDataContractSerializerFormatters();
-           ///local
-          // var ConnectionString = @"Server=DESKTOP-MCDM6RJ\MSSQLSERVER01;Database=KhatmaDB;Trusted_Connection=True;MultipleActiveResultSets=true";
-            ///Smarter
-         var ConnectionString = "Data Source = SQL5053.site4now.net; Initial Catalog = DB_A62FD0_KhatmaDB; User Id = DB_A62FD0_KhatmaDB_admin;Password = gaber789421; MultipleActiveResultSets=True";
+            ///local
+            // var ConnectionString = @"Server=DESKTOP-MCDM6RJ\MSSQLSERVER01;Database=KhatmaDB;Trusted_Connection=True;MultipleActiveResultSets=true";
+            ///Smarter//sql5063.site4now.net
+            var ConnectionString = "Data Source =SQL5063.site4now.net;Initial Catalog=DB_A62FD0_KhatmaDB;User Id=DB_A62FD0_KhatmaDB_admin;Password = gaber789421; MultipleActiveResultSets=True";
 
             services.AddDbContext<KhatmaContext>(op => {
                     op .UseLazyLoadingProxies()
@@ -76,7 +76,9 @@ namespace KhatmaBackEnd
             });
             IServiceProvider servicesProvider = _services.BuildServiceProvider();
             IHangFireJobService hngfirSrvc =servicesProvider.GetRequiredService<IHangFireJobService>();
-           RecurringJob.AddOrUpdate(() => hngfirSrvc.UpdateKhatmaCountHangfire(), Cron.MinuteInterval(2));
+            IHangFireJobService hngfirSrvc2 =servicesProvider.GetRequiredService<IHangFireJobService>();
+           RecurringJob.AddOrUpdate(() => hngfirSrvc2.NotifyUnreadedUsers(), Cron.Daily(21));
+           RecurringJob.AddOrUpdate(() => hngfirSrvc.UpdateKhatmaCountHangfire(), Cron.Daily(02));
 
         }
     }

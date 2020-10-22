@@ -25,7 +25,7 @@ namespace KhatmaBackEnd.Managers.Classes
 
         public ProcessResult<User> AddNewUser(UserForAdd user)
         {
-            var Setting = _KhatmaContext.Settings.AsEnumerable().LastOrDefault();
+            var Setting = _KhatmaContext.KhatmaSettings.AsEnumerable().LastOrDefault();
             if (Setting != null)
             {
                 if (Setting.LastDistributedPage < 604)
@@ -45,7 +45,7 @@ namespace KhatmaBackEnd.Managers.Classes
             var userViewModel = _Mapper.Map<UserForAdd, User>(user);
             _KhatmaContext.Add(userViewModel);
             Setting.LastDistributedPage = user.PageNo;
-            _KhatmaContext.Settings.Update(Setting);
+            _KhatmaContext.KhatmaSettings.Update(Setting);
             Save();
             if (String.IsNullOrEmpty(user.Password))
             {
@@ -112,9 +112,10 @@ namespace KhatmaBackEnd.Managers.Classes
             return new ProcessResult<IQueryable<User>>("GetUsersByGroupId") { Data = _KhatmaContext.Users.Where(c => c.UserName == userName), IsSucceeded = true, Status = "Ok", Exception = null };
         }
 
-        public ProcessResult<IQueryable<User>> GetUsersByGroupId(int groupId)
+        public ProcessResult<List<User>> GetUsersByGroupId(int groupId)
         {
-            return new ProcessResult<IQueryable<User>>("GetUsersByGroupId") { Data = _KhatmaContext.Users.Where(c => c.GroupId == groupId), IsSucceeded = true, Status = "Ok", Exception = null };
+            var data = _KhatmaContext.Users.Where(c => c.GroupId == groupId).ToList();
+            return new ProcessResult<List<User>>("GetUsersByGroupId") { Data = data, IsSucceeded = true, Status = "Ok", Exception = null };
         }
 
         public bool IsUserNameExist(string userName)
@@ -129,7 +130,7 @@ namespace KhatmaBackEnd.Managers.Classes
             {
                 if (!String.IsNullOrEmpty(Loginuser.DeviceToken))
                 {
-                    var userDevice = _KhatmaContext.userDevices.Where(c => c.UserID == user.Id).LastOrDefault();
+                    var userDevice = _KhatmaContext.userDevices.Where(c => c.UserID == user.Id).ToList().LastOrDefault();
                     if (userDevice != null)
                     {
                         userDevice.DeviceToken = Loginuser.DeviceToken;
@@ -148,10 +149,10 @@ namespace KhatmaBackEnd.Managers.Classes
                     Save();
 
                 }
-                var group = _KhatmaContext.Groups.Find(user.GroupId);
+                var group = _KhatmaContext.UserGroups.Find(user.GroupId);
                 var response = new LoginResponseViewModel();
                 response.User_Group = _Mapper.Map<Group, UserGroup>(group);
-                var Setting = _KhatmaContext.Settings.ToList().Last();
+                var Setting = _KhatmaContext.KhatmaSettings.ToList().Last();
                 response.KhatmaCount = Setting.KhatmaCount;
                 response.GroupId = user.GroupId;
                 response.PageNo = user.PageNo;
@@ -211,5 +212,34 @@ namespace KhatmaBackEnd.Managers.Classes
                 };
             }
         }
+
+        public ProcessResult<List<User>> GetUnReadingUsers()
+        {
+            var users = _KhatmaContext.Users.Where(c=>c.IsRead!=true).ToList();
+            return new ProcessResult<List<User>>() { Data = users, IsSucceeded = true };
+        }
+        public List<string> GetUnReadingUsersDevicesToken()
+        {
+            var users = GetUnReadingUsers().Data;
+            var userDrvicesData = _KhatmaContext.userDevices.ToList();
+            List<string> userDevices = new List<string>();
+            if (users!=null&&users.Count>0)
+            {
+                if (userDrvicesData?.Count>0)
+                {
+                    foreach (var item in users)
+                    {
+                        var userdevice = userDrvicesData.Where(c => c.UserID == item.Id).FirstOrDefault();
+                        if (userdevice!=null)
+                        {
+                            userDevices.Add(userdevice.DeviceToken);
+                        }
+                    }
+                }
+            
+            }
+            return userDevices;
+        }
+
     }
 }

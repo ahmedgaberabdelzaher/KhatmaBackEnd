@@ -20,10 +20,25 @@ namespace KhatmaBackEnd.Managers.Classes
             _userManager = userManager;
             _khatmaContext = khatmaContext;
         }
+
+        public string NotifyUnreadedUsers()
+        {
+            var unreadedUsers =_userManager.GetUnReadingUsersDevicesToken();
+            string NotificationReslt = "";
+            if (unreadedUsers.Count>0)
+            {
+                for (int i = 0; i < unreadedUsers.Count; i++)
+                {
+                    NotificationReslt = NotificationManager.SendPushNotification(unreadedUsers[i], "Alert!!","You didn’t read your page till Now");
+                }
+            }
+            return NotificationReslt;
+        }
+
         public Task<bool> UpdateKhatmaCountHangfire()
         {
             var users = _userManager.GetAll();
-        var khatmaSetting = _khatmaContext.Settings.ToList();
+        var khatmaSetting = _khatmaContext.KhatmaSettings.ToList();
             if (users.Data!=null)
             {
                 var groupedUsers = users.Data.Where(c => c.Role != "super_admin").GroupBy(c => c.GroupId);
@@ -52,13 +67,13 @@ namespace KhatmaBackEnd.Managers.Classes
                         group.ToList()[i - 1].PageNo = 1;
                         lastPage = 1;
                        PageCounter = 1;
-                       var khatmaStting = _khatmaContext.Settings.ToList().LastOrDefault();
+                       var khatmaStting = _khatmaContext.KhatmaSettings.ToList().LastOrDefault();
                        khatmaStting.KhatmaCount = khatmaStting.KhatmaCount+1;
                         }
                         group.ToList()[i - 1].IsRead = false;
-                        var LastKhatmaSetting = _khatmaContext.Settings.ToList().Last();
+                        var LastKhatmaSetting = _khatmaContext.KhatmaSettings.ToList().Last();
                         LastKhatmaSetting.LastDistributedPage = group.ToList()[i - 1].PageNo;
-                        _khatmaContext.Settings.Update(LastKhatmaSetting);
+                        _khatmaContext.KhatmaSettings.Update(LastKhatmaSetting);
 
                 }
 
@@ -100,5 +115,7 @@ namespace KhatmaBackEnd.Managers.Classes
             }
             return Task.FromResult(true);
         }
+
+
     }
 }

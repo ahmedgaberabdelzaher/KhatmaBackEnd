@@ -32,7 +32,7 @@ namespace KhatmaBackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Groups");
+                    b.ToTable("UserGroups");
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.Setting", b =>
@@ -50,7 +50,7 @@ namespace KhatmaBackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Settings");
+                    b.ToTable("KhatmaSettings");
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.User", b =>

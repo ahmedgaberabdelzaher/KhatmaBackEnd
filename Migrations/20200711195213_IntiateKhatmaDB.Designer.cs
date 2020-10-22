@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KhatmaBackEnd.Migrations
 {
     [DbContext(typeof(KhatmaContext))]
-    [Migration("20200614183248_AddLastDistributedPageColumnToSettingTable")]
-    partial class AddLastDistributedPageColumnToSettingTable
+    [Migration("20200711195213_IntiateKhatmaDB")]
+    partial class IntiateKhatmaDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,7 +34,7 @@ namespace KhatmaBackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Groups");
+                    b.ToTable("UserGroups");
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.Setting", b =>
@@ -52,7 +52,7 @@ namespace KhatmaBackEnd.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Settings");
+                    b.ToTable("KhatmaSettings");
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.User", b =>
@@ -89,11 +89,40 @@ namespace KhatmaBackEnd.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("KhatmaBackEnd.Entities.UserDevice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("DeviceToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("userDevices");
+                });
+
             modelBuilder.Entity("KhatmaBackEnd.Entities.User", b =>
                 {
                     b.HasOne("KhatmaBackEnd.Entities.Group", null)
                         .WithMany("Users")
                         .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KhatmaBackEnd.Entities.UserDevice", b =>
+                {
+                    b.HasOne("KhatmaBackEnd.Entities.User", "User")
+                        .WithMany("Devices")
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
