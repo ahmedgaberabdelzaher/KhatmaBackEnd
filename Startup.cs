@@ -36,8 +36,9 @@ namespace KhatmaBackEnd
             services.AddControllers().AddXmlDataContractSerializerFormatters();
             ///local
             // var ConnectionString = @"Server=DESKTOP-MCDM6RJ\MSSQLSERVER01;Database=KhatmaDB;Trusted_Connection=True;MultipleActiveResultSets=true";
-            ///Smarter//sql5063.site4now.net
-            var ConnectionString = "Data Source =SQL5063.site4now.net;Initial Catalog=DB_A62FD0_KhatmaDB;User Id=DB_A62FD0_KhatmaDB_admin;Password = gaber789421; MultipleActiveResultSets=True";
+            ///Smarter//sql5063.site4now.net ahmed
+            //   var ConnectionString = "Data Source =SQL5063.site4now.net;Initial Catalog=DB_A62FD0_KhatmaDB;User Id=DB_A62FD0_KhatmaDB_admin;Password = gaber789421; MultipleActiveResultSets=True";
+            var ConnectionString = "Data Source =SQL5097.site4now.net;Initial Catalog=DB_A6945F_KhatmaDB;User Id=DB_A6945F_KhatmaDB_admin;Password =doaa11711; MultipleActiveResultSets=True";
 
             services.AddDbContext<KhatmaContext>(op => {
                     op .UseLazyLoadingProxies()
