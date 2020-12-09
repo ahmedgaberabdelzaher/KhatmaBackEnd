@@ -241,5 +241,17 @@ namespace KhatmaBackEnd.Managers.Classes
             return userDevices;
         }
 
+        public ProcessResult<bool> Logout(string deviceId)
+        {
+            var userDevice = _KhatmaContext.userDevices.Where(c => c.DeviceToken == deviceId).ToList();
+            _KhatmaContext.RemoveRange(userDevice);
+            Save();
+            return new ProcessResult<bool>()
+            {
+                Data = true,
+                IsSucceeded = true,
+                Status = "200",
+            };
+        }
     }
 }

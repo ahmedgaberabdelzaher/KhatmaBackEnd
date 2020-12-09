@@ -22,6 +22,8 @@ namespace KhatmaBackEnd.Managers.Interfaces
         public bool IsUserNameExist(string userName);
         public ProcessResult<bool> ChangeReadStatus(ChangeReadStatusViewModel changeReadStatusViewModel);
         public ProcessResult<bool> DeleteUser(int userId);
+        public ProcessResult<bool> Logout(string deviceId);
+
         public void Save();
     }
 

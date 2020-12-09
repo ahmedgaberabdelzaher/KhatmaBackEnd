@@ -119,5 +119,27 @@ namespace KhatmaBackEnd.Controllers
         {
             return Ok(_UserManager.DeleteUser(userId));
         }
+
+        [HttpDelete("LogOut")]
+        public IActionResult DeleteUser(string deviceId)
+        {
+            try
+            {
+                return Ok(_UserManager.Logout(deviceId));
+
+            }
+            catch (Exception ex)
+            {
+                return Ok(
+                                     new ProcessResult<bool>()
+                                     {
+                                         Data = false,
+                                         IsSucceeded = false,
+                                         Status = "400",
+                                         Message = ex.Message
+                                     }
+                    ) ;
+            }
+        }
     }
 }

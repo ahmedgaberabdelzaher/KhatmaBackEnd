@@ -16,6 +16,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Cronos;
+using Hangfire.Dashboard;
 
 namespace KhatmaBackEnd
 {
@@ -59,8 +61,8 @@ namespace KhatmaBackEnd
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //HangFire
-            app.UseHangfireDashboard();
-            app.UseHangfireServer();
+     //       app.UseHangfireDashboard();
+
 
             if (env.IsDevelopment())
             {
@@ -70,7 +72,12 @@ namespace KhatmaBackEnd
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new MyAuthorizationFilter() },
+               
+            });
+            app.UseHangfireServer();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -78,9 +85,24 @@ namespace KhatmaBackEnd
             IServiceProvider servicesProvider = _services.BuildServiceProvider();
             IHangFireJobService hngfirSrvc =servicesProvider.GetRequiredService<IHangFireJobService>();
             IHangFireJobService hngfirSrvc2 =servicesProvider.GetRequiredService<IHangFireJobService>();
-           RecurringJob.AddOrUpdate(() => hngfirSrvc2.NotifyUnreadedUsers(), Cron.Daily(21));
+        RecurringJob.AddOrUpdate(() => hngfirSrvc2.NotifyUnreadedUsers(), Cron.HourInterval(2));
            RecurringJob.AddOrUpdate(() => hngfirSrvc.UpdateKhatmaCountHangfire(), Cron.Daily(02));
+        //  RecurringJob.AddOrUpdate(() => hngfirSrvc2.NotifyUnreadedUsers(), "0 0 */4 * **");
 
+
+
+        }
+    }
+
+    public class MyAuthorizationFilter : IDashboardAuthorizationFilter
+    {
+        public bool Authorize(DashboardContext context)
+        {
+            var httpContext = context.GetHttpContext();
+
+            // Allow all authenticated users to see the Dashboard (potentially dangerous).
+            // return httpContext.User.Identity.IsAuthenticated;
+            return true;
         }
     }
 }
