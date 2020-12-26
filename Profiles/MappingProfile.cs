@@ -14,7 +14,7 @@ namespace KhatmaBackEnd.Profiles
         public MappingProfile()
         {
             CreateMap<Group, GroupViewModel>()
-                .ForMember(dest => dest.admin, opt => opt.MapFrom(src => src.Users.Where(c => c.Role == "admin").FirstOrDefault()))
+                .ForMember(dest => dest.admin, opt => opt.MapFrom(src => src.Users.Where(c => c.Role ==Utilites.Enums.Roles.GroupAdmin).FirstOrDefault()))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
             CreateMap<GroupViewModel, Group>();
@@ -22,8 +22,8 @@ namespace KhatmaBackEnd.Profiles
             CreateMap<User, UserForAdd>();
             CreateMap<GroupForCreateViewModel, Group>();
             CreateMap<Group, UserGroup>();
-
-
+            CreateMap<User, UserData>();
+            CreateMap<UserData, User>();
         }
     }
 }

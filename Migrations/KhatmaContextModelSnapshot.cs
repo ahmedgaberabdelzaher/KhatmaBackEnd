@@ -26,13 +26,53 @@ namespace KhatmaBackEnd.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("KhatmaId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("KhatmaId");
+
                     b.ToTable("UserGroups");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            KhatmaId = 1,
+                            Name = "Public"
+                        });
+                });
+
+            modelBuilder.Entity("KhatmaBackEnd.Entities.Khatma", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("khatmas");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Public",
+                            Type = 0
+                        });
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.Setting", b =>
@@ -45,12 +85,26 @@ namespace KhatmaBackEnd.Migrations
                     b.Property<int>("KhatmaCount")
                         .HasColumnType("int");
 
+                    b.Property<int?>("KhatmaId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("LastDistributedPage")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("KhatmaId");
+
                     b.ToTable("KhatmaSettings");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            KhatmaCount = 0,
+                            KhatmaId = 1,
+                            LastDistributedPage = 0
+                        });
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.User", b =>
@@ -60,11 +114,23 @@ namespace KhatmaBackEnd.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("GroupId")
+                    b.Property<string>("FName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<bool?>("IsRead")
                         .HasColumnType("bit");
+
+                    b.Property<int>("KhatmaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PageDistributedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("PageNo")
                         .HasColumnType("int");
@@ -72,9 +138,11 @@ namespace KhatmaBackEnd.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("ReadedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -83,6 +151,8 @@ namespace KhatmaBackEnd.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GroupId");
+
+                    b.HasIndex("KhatmaId");
 
                     b.ToTable("Users");
                 });
@@ -107,11 +177,53 @@ namespace KhatmaBackEnd.Migrations
                     b.ToTable("userDevices");
                 });
 
+            modelBuilder.Entity("KhatmaBackEnd.Entities.UserPages", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool?>("IRead")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("PageDistributedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PageNo")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReadedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("userPages");
+                });
+
+            modelBuilder.Entity("KhatmaBackEnd.Entities.Group", b =>
+                {
+                    b.HasOne("KhatmaBackEnd.Entities.Khatma", "Khatma")
+                        .WithMany()
+                        .HasForeignKey("KhatmaId");
+                });
+
+            modelBuilder.Entity("KhatmaBackEnd.Entities.Setting", b =>
+                {
+                    b.HasOne("KhatmaBackEnd.Entities.Khatma", "Khatma")
+                        .WithMany()
+                        .HasForeignKey("KhatmaId");
+                });
+
             modelBuilder.Entity("KhatmaBackEnd.Entities.User", b =>
                 {
-                    b.HasOne("KhatmaBackEnd.Entities.Group", null)
+                    b.HasOne("KhatmaBackEnd.Entities.Group", "group")
                         .WithMany("Users")
-                        .HasForeignKey("GroupId")
+                        .HasForeignKey("GroupId");
+
+                    b.HasOne("KhatmaBackEnd.Entities.Khatma", "khatma")
+                        .WithMany()
+                        .HasForeignKey("KhatmaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -119,7 +231,7 @@ namespace KhatmaBackEnd.Migrations
             modelBuilder.Entity("KhatmaBackEnd.Entities.UserDevice", b =>
                 {
                     b.HasOne("KhatmaBackEnd.Entities.User", "User")
-                        .WithMany("Devices")
+                        .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

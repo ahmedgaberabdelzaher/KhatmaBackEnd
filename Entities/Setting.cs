@@ -14,5 +14,7 @@ namespace KhatmaBackEnd.Entities
         public int Id { get; set; }
         public int KhatmaCount { get; set; }
         public int? LastDistributedPage { get; set; }
+        public int? KhatmaId { get; set; }
+        public virtual Khatma Khatma { get; set; }
     }
 }

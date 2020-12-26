@@ -23,9 +23,9 @@ namespace KhatmaBackEnd.Managers.Classes
             _Mapper = mapper;
         }
 
-        public ProcessResult<User> AddNewUser(UserForAdd user)
+        public ProcessResult<UserData> AddNewUser(UserForAdd user)
         {
-            var Setting = _KhatmaContext.KhatmaSettings.AsEnumerable().LastOrDefault();
+            var Setting = _KhatmaContext.KhatmaSettings.Where(c=>c.KhatmaId==user.KhatmaId).AsEnumerable().LastOrDefault();
             if (Setting != null)
             {
                 if (Setting.LastDistributedPage < 604)
@@ -41,7 +41,7 @@ namespace KhatmaBackEnd.Managers.Classes
             {
                 user.PageNo = 1;
             }
-
+            user.PageDistributedDate = DateTime.UtcNow;
             var userViewModel = _Mapper.Map<UserForAdd, User>(user);
             _KhatmaContext.Add(userViewModel);
             Setting.LastDistributedPage = user.PageNo;
@@ -54,9 +54,9 @@ namespace KhatmaBackEnd.Managers.Classes
                 _KhatmaContext.Users.Update(userViewModel);
                 Save();
             }
-            return new ProcessResult<User>()
+            return new ProcessResult<UserData>()
             {
-                Data = GetUserByUserName(user.UserName).Data.First(),
+               Data = GetUserByUserName(user.UserName).Data,
                 IsSucceeded = true,
                 Message = "User Added Sucessfuly",
                 TotalUserCount = GetAllUsersCount()
@@ -70,6 +70,7 @@ namespace KhatmaBackEnd.Managers.Classes
             if (user != null)
             {
                 user.IsRead = changeReadStatusViewModel.Status;
+                user.ReadedDate = DateTime.UtcNow;
                 _KhatmaContext.Update(user);
                 Save();
                 return new ProcessResult<bool>()
@@ -107,9 +108,18 @@ namespace KhatmaBackEnd.Managers.Classes
             return _KhatmaContext.Users.Count();
         }
 
-        public ProcessResult<IQueryable<User>> GetUserByUserName(string userName)
+        public ProcessResult<UserData> GetUserByUserName(string userName)
         {
-            return new ProcessResult<IQueryable<User>>("GetUsersByGroupId") { Data = _KhatmaContext.Users.Where(c => c.UserName == userName), IsSucceeded = true, Status = "Ok", Exception = null };
+          //  var IsUserNameExists = IsUserNameExist(userName);
+            if (IsUserNameExist(userName))
+            {
+                var data = _KhatmaContext.Users.Where(c => c.UserName == userName).AsEnumerable<User>().ToList().First();
+                return new ProcessResult<UserData>("GetUserByUserName") { Data = _Mapper.Map<UserData>(data), IsSucceeded = true, Status = "Ok", Exception = null };
+
+            }
+            else {
+                return new ProcessResult<UserData>("GetUserByUserName") { Data = null, IsSucceeded = true, Status = "Ok", Exception = null,Message="user Name Not exist" };
+            }
         }
 
         public ProcessResult<List<User>> GetUsersByGroupId(int groupId)
@@ -253,5 +263,19 @@ namespace KhatmaBackEnd.Managers.Classes
                 Status = "200",
             };
         }
+
+        public ProcessResult<bool> AddUserDeviceToken(UserDevice userDevice)
+        {
+          //  UserDevice userDevice = new UserDevice() { DeviceToken = deviceId, UserID = UserId };
+            _KhatmaContext.Add(userDevice);
+            Save();
+            return new ProcessResult<bool>()
+            {
+                Data = true,
+                IsSucceeded = true,
+                Status = "200",
+            };
+        }
+
     }
 }

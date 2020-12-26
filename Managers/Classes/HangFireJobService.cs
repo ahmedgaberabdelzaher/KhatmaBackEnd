@@ -41,7 +41,7 @@ namespace KhatmaBackEnd.Managers.Classes
         var khatmaSetting = _khatmaContext.KhatmaSettings.ToList();
             if (users.Data!=null)
             {
-                var groupedUsers = users.Data.Where(c => c.Role != "super_admin").GroupBy(c => c.GroupId);
+                var groupedUsers = users.Data.Where(c => c.Role != Utilites.Enums.Roles.KhatmaAdmin).GroupBy(c => c.GroupId);
                 int GroupIndex = 0;
                 foreach (var group in groupedUsers)
                 {

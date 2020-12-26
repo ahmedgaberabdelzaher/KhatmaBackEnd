@@ -48,10 +48,30 @@ namespace KhatmaBackEnd.Controllers
            // return Ok(_KhatmaContext.Users);
             return Ok(_UserManager.GetAll());
         }
-
+        [HttpGet("GetUserByUserName")]
+        public IActionResult GetUserByUserName(string userName)
+        {
+            try
+            {
+                var res = _UserManager.GetUserByUserName(userName);
+                var data = res.Data;
+                var procResult = new ProcessResult<UserData>() {
+                    IsSucceeded=true,
+                    Data=data,
+                     Status="200"
+                };
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ProcessResult<bool>() { IsSucceeded = false, Message = ex.Message, Data = false });
+            }
+        }
         [HttpPost()]
         public IActionResult AddNewUser([FromBody]UserForAdd user)
         {
+            try
+            {
             if (user == null)
             {
                 return BadRequest(new ProcessResult<UserForAdd>() {Data=null,IsSucceeded=false,Status="400",MethodName= "AddNewUser",Message="Invalid Data" });
@@ -70,6 +90,11 @@ namespace KhatmaBackEnd.Controllers
                     return Created("", _UserManager.AddNewUser(_Mapper.Map<UserForAdd>(user)));
                   //  return Ok("User added"+ _KhatmaContext.Users.Count());
                 }
+            }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ProcessResult<UserForAdd>() { Data = null, IsSucceeded = false, Status = "400", MethodName = "AddNewUser", Message =ex.Message });
             }
         }
 
@@ -141,5 +166,24 @@ namespace KhatmaBackEnd.Controllers
                     ) ;
             }
         }
-    }
+       [HttpPost("AddUserDeviceToken")]
+        public IActionResult AddUserDeviceToken([FromBody]UserDevice userDevice)
+        {
+            try
+            {
+                return Ok(_UserManager.AddUserDeviceToken(userDevice));
+            }
+            catch (Exception ex)
+            {
+                return Ok(
+                                     new ProcessResult<bool>()
+                                     {
+                                         Data = false,
+                                         IsSucceeded = false,
+                                         Status = "200",
+                                         Message = ex.Message
+                                     }
+                    ) ;
+            }
+        }   }
 }

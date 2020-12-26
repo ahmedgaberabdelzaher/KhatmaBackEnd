@@ -12,10 +12,10 @@ namespace KhatmaBackEnd.Managers.Interfaces
     {
         public ProcessResult<List<User>> GetUsersByGroupId(int groupId);   
         
-        public ProcessResult<IQueryable<User>> GetUserByUserName(string userName);
+        public ProcessResult<UserData> GetUserByUserName(string userName);
         public ProcessResult<List<User>> GetAll();
         public int GetAllUsersCount();
-        public ProcessResult<User> AddNewUser(UserForAdd user);
+        public ProcessResult<UserData> AddNewUser(UserForAdd user);
         public ProcessResult<List<User>> GetUnReadingUsers();
         public List<string> GetUnReadingUsersDevicesToken();
         public ProcessResult<LoginResponseViewModel> Login(LoginViewModel user);
@@ -23,6 +23,7 @@ namespace KhatmaBackEnd.Managers.Interfaces
         public ProcessResult<bool> ChangeReadStatus(ChangeReadStatusViewModel changeReadStatusViewModel);
         public ProcessResult<bool> DeleteUser(int userId);
         public ProcessResult<bool> Logout(string deviceId);
+        public ProcessResult<bool> AddUserDeviceToken(UserDevice userDevice);
 
         public void Save();
     }

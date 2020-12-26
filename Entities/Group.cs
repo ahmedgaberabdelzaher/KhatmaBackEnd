@@ -14,6 +14,8 @@ namespace KhatmaBackEnd.Entities
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
+        public int? KhatmaId { get; set; }
+        public virtual Khatma Khatma  { get; set; }
         //public int? UserCount { get; set; }
         public virtual ICollection<User> Users { get; set; }
 
