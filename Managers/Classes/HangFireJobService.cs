@@ -1,8 +1,10 @@
-﻿using KhatmaBackEnd.DBContext;
+﻿using Hangfire;
+using KhatmaBackEnd.DBContext;
 using KhatmaBackEnd.Entities;
 using KhatmaBackEnd.Managers.Interfaces;
 using KhatmaBackEnd.Utilites;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -29,28 +31,38 @@ namespace KhatmaBackEnd.Managers.Classes
             {
                 for (int i = 0; i < unreadedUsers.Count; i++)
                 {
-                    NotificationReslt = NotificationManager.SendPushNotification(unreadedUsers[i], "Alert!!","You didn’t read your page till Now");
+                    NotificationReslt = NotificationManager.SendPushNotification(unreadedUsers[i], "تنبيه!!","تنبيه لم يتم قراءه الصفحه المخصصه حتي الان");
                 }
             }
+            var jobId2 = BackgroundJob.Schedule(
+() => NotifyUnreadedUsers(),
+TimeSpan.FromHours(2));
             return NotificationReslt;
         }
 
-        public Task<bool> UpdateKhatmaCountHangfire()
+        public Task<bool> UpdateKhatmaCountHangfireOrderByGroup()
         {
             var users = _userManager.GetAll();
-        var khatmaSetting = _khatmaContext.KhatmaSettings.ToList();
+        var khatmaSetting = _khatmaContext.KhatmaSettings.AsNoTracking().ToList();
             if (users.Data!=null)
             {
+                var unreadedPage = _userManager.GetUnReadingUsers();
                 var groupedUsers = users.Data.Where(c => c.Role != Utilites.Enums.Roles.KhatmaAdmin).GroupBy(c => c.GroupId);
                 int GroupIndex = 0;
                 foreach (var group in groupedUsers)
                 {
-                   // var lastPage = users.Data.OrderBy(c=>c.PageNo).Last().PageNo;
+                    // var lastPage = users.Data.OrderBy(c=>c.PageNo).Last().PageNo;
+                  
                    var lastPage = khatmaSetting.Last().LastDistributedPage;
                     int PageCounter = 0;
                     for (int i = 1; i <= group.ToList().Count(); i++)
                 {
-                    if (lastPage + i <= 604)
+                        if (unreadedPage.Data?.Count > 0&& unreadedPage.Data?.Count>i)
+                        {
+                            group.ToList()[i - 1].PageNo = unreadedPage.Data[i - 1].PageNo;
+                        }
+                       
+                        if (lastPage + i <= 604)
                     {
                             if (PageCounter==0)
                             {
@@ -116,6 +128,96 @@ namespace KhatmaBackEnd.Managers.Classes
             return Task.FromResult(true);
         }
 
+        public Task<bool> UpdateKhatmaCountHangfire()
+        {
+            var users = _userManager.GetAll();
+            var khatmaSetting = _khatmaContext.KhatmaSettings.ToList();
+            if (users.Data != null)
+            {
+                var unreadedPage = _userManager.GetUnReadingUsers();
+                var groupedUsers = users.Data.Where(c => c.Role != Utilites.Enums.Roles.KhatmaAdmin);
+                int GroupIndex = 0;
+             //   foreach (var group in groupedUsers)
+               // {
+                    // var lastPage = users.Data.OrderBy(c=>c.PageNo).Last().PageNo;
+
+                    var lastPage = khatmaSetting.Last().LastDistributedPage;
+                    int PageCounter = 0;
+                    for (int i = 1; i <= groupedUsers.ToList().Count(); i++)
+                    {
+                    if (unreadedPage.Data?.Count > 0 && unreadedPage.Data?.Count > i)
+                    {
+                        groupedUsers.ToList()[i - 1].PageNo = unreadedPage.Data[i - 1].PageNo;
+                    }
+                    else
+                    {
+                        if (lastPage + i <= 604)
+                        {
+                            if (PageCounter == 0)
+                            {
+                                groupedUsers.ToList()[i - 1].PageNo = lastPage + i;
+                            }
+                            else
+                            {
+                                PageCounter++;
+                                groupedUsers.ToList()[i - 1].PageNo = PageCounter;
+                            }
+                        }
+                        else
+                        {
+                            groupedUsers.ToList()[i - 1].PageNo = 1;
+                            lastPage = 1;
+                            PageCounter = 1;
+                            var khatmaStting = _khatmaContext.KhatmaSettings.ToList().LastOrDefault();
+                            khatmaStting.KhatmaCount = khatmaStting.KhatmaCount + 1;
+                        }
+
+                        groupedUsers.ToList()[i - 1].IsRead = false;
+                        var LastKhatmaSetting = _khatmaContext.KhatmaSettings.ToList().Last();
+                        LastKhatmaSetting.LastDistributedPage = groupedUsers.ToList()[i - 1].PageNo;
+
+                        _khatmaContext.KhatmaSettings.Update(LastKhatmaSetting);
+                    }
+                    }
+
+                    /*if (group.Key == groupedUsers.Last().Key)
+                    {
+                        //    _khatmaContext.Update(new Setting() { })
+                    }*/
+                    //  GroupIndex++;
+               // }
+
+                //for (int i = 1; i <= group.Count(); i++)
+                //{
+                //    if (lastPage + i < 604)
+                //    {
+                //        users.Data[i - 1].PageNo = lastPage + i;
+                //    }
+                //    else
+                //    {
+                //        users.Data[i - 1].PageNo = 1;
+                //        lastPage = 1;
+                //        var khatmaCount = _khatmaContext.Settings.ToList().LastOrDefault();
+                //        if (khatmaCount != null)
+                //        {
+                //            _khatmaContext.Settings.Update(new Setting() { KhatmaCount = khatmaCount.KhatmaCount + 1 });
+
+                //        }
+                //        else
+                //        {
+                //            _khatmaContext.Settings.Add(new Setting() { KhatmaCount = 1 });
+
+                //        }
+                //    }
+                //    //  _khatmaContext.Users.Update(user);
+
+                //}
+
+                _khatmaContext.Users.UpdateRange(users.Data);
+                _khatmaContext.SaveChanges();
+            }
+            return Task.FromResult(true);
+        }
 
     }
 }

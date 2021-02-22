@@ -45,8 +45,18 @@ namespace KhatmaBackEnd.Controllers
         [HttpGet()]
         public IActionResult GetAllUsers()
         {
-           // return Ok(_KhatmaContext.Users);
-            return Ok(_UserManager.GetAll());
+            // return Ok(_KhatmaContext.Users);
+            try
+            {
+                var data = _UserManager.GetAll();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return Ok(ex.Message);
+                    
+            }
+          //  return Ok(_UserManager.GetAll());
         }
         [HttpGet("GetUserByUserName")]
         public IActionResult GetUserByUserName(string userName)

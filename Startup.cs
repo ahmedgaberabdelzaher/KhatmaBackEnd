@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Cronos;
 using Hangfire.Dashboard;
 using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace KhatmaBackEnd
 {
@@ -69,16 +70,19 @@ namespace KhatmaBackEnd
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //HangFire
-     //       app.UseHangfireDashboard();
-
-
+            //       app.UseHangfireDashboard();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseRouting();
-
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+        Path.Combine(env.ContentRootPath, "Images")),
+                RequestPath = "/Images"
+            });
             app.UseAuthorization();
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
@@ -93,9 +97,19 @@ namespace KhatmaBackEnd
             IServiceProvider servicesProvider = _services.BuildServiceProvider();
             IHangFireJobService hngfirSrvc =servicesProvider.GetRequiredService<IHangFireJobService>();
             IHangFireJobService hngfirSrvc2 =servicesProvider.GetRequiredService<IHangFireJobService>();
-        RecurringJob.AddOrUpdate(() => hngfirSrvc2.NotifyUnreadedUsers(), Cron.HourInterval(2));
-           RecurringJob.AddOrUpdate(() => hngfirSrvc.UpdateKhatmaCountHangfire(), Cron.Daily(02));
-        //  RecurringJob.AddOrUpdate(() => hngfirSrvc2.NotifyUnreadedUsers(), "0 0 */4 * **");
+            var jobId2 = BackgroundJob.Schedule(
+() => hngfirSrvc2.NotifyUnreadedUsers(),
+TimeSpan.FromSeconds(1));
+            /*  var jobId2 = BackgroundJob.Schedule(
+  () => hngfirSrvc2.UpdateKhatmaCountHangfire(),
+  TimeSpan.FromSeconds(1));
+              var jobId = BackgroundJob.Schedule(
+      () => hngfirSrvc2.NotifyUnreadedUsers(),
+      TimeSpan.FromSeconds(2));*/
+
+           // RecurringJob.AddOrUpdate(() => hngfirSrvc2.NotifyUnreadedUsers(), Cron.Hourly);
+          RecurringJob.AddOrUpdate(() => hngfirSrvc.UpdateKhatmaCountHangfire(), Cron.Daily(2));
+       //  RecurringJob(() => hngfirSrvc2.NotifyUnreadedUsers(), "0 0 */4 * **");
 
 
 

@@ -5,6 +5,7 @@ using KhatmaBackEnd.Managers.Interfaces;
 using KhatmaBackEnd.Utilites;
 using KhatmaBackEnd.ViewModels;
 using Microsoft.CodeAnalysis.FlowAnalysis;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,7 +99,8 @@ namespace KhatmaBackEnd.Managers.Classes
 
         public ProcessResult<List<User>> GetAll()
         {
-            return new ProcessResult<List<User>>("GetAll") { Data = _KhatmaContext.Users.ToList(), IsSucceeded = true, Status = "Ok", Exception = null };
+            var data = _KhatmaContext.Users.AsNoTracking().ToList();
+            return new ProcessResult<List<User>>("GetAll") { Data = data, IsSucceeded = true, Status = "Ok", Exception = null };
 
         }
 
@@ -225,7 +227,7 @@ namespace KhatmaBackEnd.Managers.Classes
 
         public ProcessResult<List<User>> GetUnReadingUsers()
         {
-            var users = _KhatmaContext.Users.Where(c=>c.IsRead!=true).ToList();
+            var users = _KhatmaContext.Users.AsNoTracking().Where(c=>c.IsRead!=true).ToList();
             return new ProcessResult<List<User>>() { Data = users, IsSucceeded = true };
         }
         public List<string> GetUnReadingUsersDevicesToken()
