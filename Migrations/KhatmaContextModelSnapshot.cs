@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace KhatmaBackEnd.Migrations
 {
     [DbContext(typeof(KhatmaContext))]
@@ -15,16 +17,21 @@ namespace KhatmaBackEnd.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.Group", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("KhatmaId")
                         .HasColumnType("int");
@@ -52,8 +59,9 @@ namespace KhatmaBackEnd.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -79,8 +87,9 @@ namespace KhatmaBackEnd.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("KhatmaCount")
                         .HasColumnType("int");
@@ -111,8 +120,9 @@ namespace KhatmaBackEnd.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FName")
                         .HasColumnType("nvarchar(max)");
@@ -161,8 +171,9 @@ namespace KhatmaBackEnd.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DeviceToken")
                         .HasColumnType("nvarchar(max)");
@@ -181,8 +192,9 @@ namespace KhatmaBackEnd.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool?>("IRead")
                         .HasColumnType("bit");
@@ -206,6 +218,8 @@ namespace KhatmaBackEnd.Migrations
                     b.HasOne("KhatmaBackEnd.Entities.Khatma", "Khatma")
                         .WithMany()
                         .HasForeignKey("KhatmaId");
+
+                    b.Navigation("Khatma");
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.Setting", b =>
@@ -213,6 +227,8 @@ namespace KhatmaBackEnd.Migrations
                     b.HasOne("KhatmaBackEnd.Entities.Khatma", "Khatma")
                         .WithMany()
                         .HasForeignKey("KhatmaId");
+
+                    b.Navigation("Khatma");
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.User", b =>
@@ -226,6 +242,10 @@ namespace KhatmaBackEnd.Migrations
                         .HasForeignKey("KhatmaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("group");
+
+                    b.Navigation("khatma");
                 });
 
             modelBuilder.Entity("KhatmaBackEnd.Entities.UserDevice", b =>
@@ -235,6 +255,13 @@ namespace KhatmaBackEnd.Migrations
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("KhatmaBackEnd.Entities.Group", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

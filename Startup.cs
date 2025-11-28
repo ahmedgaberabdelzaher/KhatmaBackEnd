@@ -38,13 +38,15 @@ namespace KhatmaBackEnd
         {
             _services = services;
             services.AddControllers();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
             //.AddXmlDataContractSerializerFormatters();
             ///local
             // var ConnectionString = @"Server=DESKTOP-MCDM6RJ\MSSQLSERVER01;Database=KhatmaDB;Trusted_Connection=True;MultipleActiveResultSets=true";
             ///Smarter//sql5063.site4now.net ahmed
             //   var ConnectionString = "Data Source =SQL5063.site4now.net;Initial Catalog=DB_A62FD0_KhatmaDB;User Id=DB_A62FD0_KhatmaDB_admin;Password = gaber789421; MultipleActiveResultSets=True";
-         //   var ConnectionString = "Data Source =SQL5097.site4now.net;Initial Catalog=DB_A6945F_KhatmaDB;User Id=DB_A6945F_KhatmaDB_admin;Password =doaa11711; MultipleActiveResultSets=True";
-         //  var ConnectionString = "Data Source =SQL5053.site4now.net;Initial Catalog=DB_A6BD77_ahmedgaber1994;User Id=DB_A6BD77_ahmedgaber1994_admin;Password = gaber789421; MultipleActiveResultSets=True";
+            //   var ConnectionString = "Data Source =SQL5097.site4now.net;Initial Catalog=DB_A6945F_KhatmaDB;User Id=DB_A6945F_KhatmaDB_admin;Password =doaa11711; MultipleActiveResultSets=True";
+            //  var ConnectionString = "Data Source =SQL5053.site4now.net;Initial Catalog=DB_A6BD77_ahmedgaber1994;User Id=DB_A6BD77_ahmedgaber1994_admin;Password = gaber789421; MultipleActiveResultSets=True";
             IConfigurationRoot configuration = new ConfigurationBuilder()
               .SetBasePath(Directory.GetCurrentDirectory())
               .AddJsonFile("appsettings.json")
@@ -75,7 +77,8 @@ namespace KhatmaBackEnd
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseRouting();
             app.UseStaticFiles(new StaticFileOptions
             {

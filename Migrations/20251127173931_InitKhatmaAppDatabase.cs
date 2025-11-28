@@ -1,20 +1,24 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
+#nullable disable
+
 namespace KhatmaBackEnd.Migrations
 {
-    public partial class IntaiteDb : Migration
+    /// <inheritdoc />
+    public partial class InitKhatmaAppDatabase : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
                 name: "khatmas",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: false),
-                    Type = table.Column<int>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -25,12 +29,12 @@ namespace KhatmaBackEnd.Migrations
                 name: "userPages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PageNo = table.Column<int>(nullable: true),
-                    IRead = table.Column<bool>(nullable: true),
-                    PageDistributedDate = table.Column<DateTime>(nullable: true),
-                    ReadedDate = table.Column<DateTime>(nullable: true)
+                    PageNo = table.Column<int>(type: "int", nullable: true),
+                    IRead = table.Column<bool>(type: "bit", nullable: true),
+                    PageDistributedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReadedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -41,11 +45,11 @@ namespace KhatmaBackEnd.Migrations
                 name: "KhatmaSettings",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    KhatmaCount = table.Column<int>(nullable: false),
-                    LastDistributedPage = table.Column<int>(nullable: true),
-                    KhatmaId = table.Column<int>(nullable: true)
+                    KhatmaCount = table.Column<int>(type: "int", nullable: false),
+                    LastDistributedPage = table.Column<int>(type: "int", nullable: true),
+                    KhatmaId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -54,18 +58,17 @@ namespace KhatmaBackEnd.Migrations
                         name: "FK_KhatmaSettings_khatmas_KhatmaId",
                         column: x => x.KhatmaId,
                         principalTable: "khatmas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "UserGroups",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: false),
-                    KhatmaId = table.Column<int>(nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    KhatmaId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -74,27 +77,26 @@ namespace KhatmaBackEnd.Migrations
                         name: "FK_UserGroups_khatmas_KhatmaId",
                         column: x => x.KhatmaId,
                         principalTable: "khatmas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(nullable: false),
-                    FName = table.Column<string>(nullable: true),
-                    LName = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true),
-                    Role = table.Column<int>(nullable: false),
-                    PageNo = table.Column<int>(nullable: true),
-                    IsRead = table.Column<bool>(nullable: true),
-                    PageDistributedDate = table.Column<DateTime>(nullable: true),
-                    ReadedDate = table.Column<DateTime>(nullable: true),
-                    GroupId = table.Column<int>(nullable: true),
-                    KhatmaId = table.Column<int>(nullable: false)
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    PageNo = table.Column<int>(type: "int", nullable: true),
+                    IsRead = table.Column<bool>(type: "bit", nullable: true),
+                    PageDistributedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReadedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    GroupId = table.Column<int>(type: "int", nullable: true),
+                    KhatmaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,8 +105,7 @@ namespace KhatmaBackEnd.Migrations
                         name: "FK_Users_UserGroups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "UserGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Users_khatmas_KhatmaId",
                         column: x => x.KhatmaId,
@@ -117,10 +118,10 @@ namespace KhatmaBackEnd.Migrations
                 name: "userDevices",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(nullable: false),
-                    DeviceToken = table.Column<string>(nullable: true)
+                    UserID = table.Column<int>(type: "int", nullable: false),
+                    DeviceToken = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -174,6 +175,7 @@ namespace KhatmaBackEnd.Migrations
                 column: "KhatmaId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
