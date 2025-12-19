@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using AutoMapper;
 using Cronos;
 using Hangfire;
@@ -15,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.IO;
+using System.Text.Json.Serialization;
 
 namespace KhatmaBackEnd
 {
@@ -25,7 +26,10 @@ namespace KhatmaBackEnd
             var builder = WebApplication.CreateBuilder(args);
 
             // Services
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
